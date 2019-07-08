@@ -36,13 +36,16 @@ public class UserWallet {
     // TODO remove excessive copy code from constructors
     public UserWallet(String userId, Context context, PeerGroup peerGroup) throws IOException {
         this.peerGroup = peerGroup;
-        id = UUID.randomUUID();
         this.userId = userId;
         this.context = context;
-        wallet = new Wallet(context);
+
+        id = UUID.randomUUID();
+
         String workDir = System.getProperty("user.home") + "/." + PREFIX;
         new File(workDir).mkdirs();
         walletFile = new File(workDir, PREFIX + id + ".wallet");
+
+        wallet = new Wallet(context);
 
         startupAutoSaveToFile();
 
@@ -50,10 +53,13 @@ public class UserWallet {
 
     public UserWallet(String walletId, String userId, Context context, String walletFileName, PeerGroup peerGroup) throws IOException, UnreadableWalletException {
         this.peerGroup = peerGroup;
-        id = UUID.fromString(walletId);
         this.userId = userId;
         this.context = context;
+
+        id = UUID.fromString(walletId);
+
         walletFile = new File(walletFileName);
+
         wallet = Wallet.loadFromFile(walletFile);
 
         startupAutoSaveToFile();
