@@ -33,31 +33,51 @@ public class UserWallet {
 
     private PeerGroup peerGroup;
 
-    // TODO remove excessive copy code from constructors
-    public UserWallet(String userId, Context context, PeerGroup peerGroup) throws IOException {
-        this.peerGroup = peerGroup;
-        this.userId = userId;
-        this.context = context;
-
-        this.walletId = UUID.randomUUID();
-
+    /***
+     * This method creates a new UserWallet object instance by creating a new wallet.
+     * @param userId the user ID the wallet belongs to
+     * @param context bitcoinj context object
+     * @param peerGroup bitcoinj peer group
+     *
+     * @throws IOException if there is something wrong with the wallet file itself
+     */
+    UserWallet(String userId, Context context, PeerGroup peerGroup) throws IOException {
         String workDir = System.getProperty("user.home") + "/." + PREFIX;
         new File(workDir).mkdirs();
+
+        String walletId = UUID.randomUUID().toString();
         String walletFileName = workDir + "/" + PREFIX + walletId + ".wallet";
 
-        walletFile = new File(walletFileName);
+        try {
+            initWallet(walletId, userId, context, walletFileName, peerGroup);
 
-        wallet = new Wallet(context);
-
-        startupAutoSaveToFile();
-
+        } catch (UnreadableWalletException e) {
+            logger.error("this should never happen");
+            e.printStackTrace();
+        }
     }
 
-    public UserWallet(String walletId, String userId, Context context, String walletFileName, PeerGroup peerGroup) throws IOException, UnreadableWalletException {
+    /***
+     * This method constructs a UserWallet object instance by opening an existing wallet file or creating a new wallet.
+     *
+     * @param walletId the ID of the wallet
+     * @param userId the user ID the wallet belongs to
+     * @param context bitcoinj context object
+     * @param walletFileName the filename of the wallet;
+     *                       if this wallet file does not exist, a new wallet will be created
+     * @param peerGroup bitcoinj peer group
+     *
+     * @throws IOException if there is something wrong with the wallet file itself
+     * @throws UnreadableWalletException if the wallet is ûnreadable
+     */
+    UserWallet(String walletId, String userId, Context context, String walletFileName, PeerGroup peerGroup) throws IOException, UnreadableWalletException {
+        initWallet(walletId, userId, context, walletFileName, peerGroup);
+    }
+
+    private void initWallet(String walletId, String userId, Context context, String walletFileName, PeerGroup peerGroup) throws IOException, UnreadableWalletException {
         this.peerGroup = peerGroup;
         this.userId = userId;
         this.context = context;
-
         this.walletId = UUID.fromString(walletId);
 
         walletFile = new File(walletFileName);
@@ -67,11 +87,11 @@ public class UserWallet {
         else
             wallet = new Wallet(context);
 
-        startupAutoSaveToFile();
-
+        startupAutosaveToFile();
     }
 
-    private void startupAutoSaveToFile() throws IOException {
+
+    private void startupAutosaveToFile() throws IOException {
         try {
             wallet.autosaveToFile(walletFile, 5, TimeUnit.SECONDS, null).saveNow();
         } catch (IOException e) {
@@ -80,7 +100,10 @@ public class UserWallet {
         }
     }
 
-    public void shutdownAutosaveAndSave() {
+    /***
+     * This method shuts down the autosave feature of the wallet and finally saves the wallet one last time.
+     */
+    void shutdownAutosaveAndSave() {
         try {
             wallet.shutdownAutosaveAndWait();
             wallet.saveToFile(walletFile);
