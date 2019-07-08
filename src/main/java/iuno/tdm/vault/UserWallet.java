@@ -33,6 +33,7 @@ public class UserWallet {
 
     private PeerGroup peerGroup;
 
+    // TODO remove excessive copy code from constructors
     public UserWallet(String userId, Context context, PeerGroup peerGroup) throws IOException {
         this.peerGroup = peerGroup;
         id = UUID.randomUUID();
@@ -44,14 +45,12 @@ public class UserWallet {
         walletFile = new File(workDir, PREFIX + id + ".wallet");
         try {
             wallet.autosaveToFile(walletFile, 5, TimeUnit.SECONDS, null).saveNow();
-            // TODO this needs to be deactivated after peergroup is stopped and before server is shut down
         } catch (IOException e) {
             logger.error(String.format("creating wallet file failed: %s", e.getMessage()));
             throw new IOException(String.format("creating wallet file failed: %s", e.getMessage()));
         }
 
     }
-
 
     public UserWallet(String walletId, String userId, Context context, String walletFileName, PeerGroup peerGroup) throws IOException, UnreadableWalletException {
         this.peerGroup = peerGroup;
@@ -68,6 +67,16 @@ public class UserWallet {
             throw new IOException(String.format("creating wallet file failed: %s", e.getMessage()));
         }
 
+    }
+
+    public void shutdownAutosaveAndSave() {
+        try {
+            wallet.shutdownAutosaveAndWait();
+            wallet.saveToFile(walletFile);
+        } catch (IOException e) {
+            logger.error(String.format("saving wallet file failed: %s", e.getMessage()));
+            e.printStackTrace();
+        }
     }
 
     public void deleteWallet() {
