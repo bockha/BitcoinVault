@@ -43,12 +43,8 @@ public class UserWallet {
         String workDir = System.getProperty("user.home") + "/." + PREFIX;
         new File(workDir).mkdirs();
         walletFile = new File(workDir, PREFIX + id + ".wallet");
-        try {
-            wallet.autosaveToFile(walletFile, 5, TimeUnit.SECONDS, null).saveNow();
-        } catch (IOException e) {
-            logger.error(String.format("creating wallet file failed: %s", e.getMessage()));
-            throw new IOException(String.format("creating wallet file failed: %s", e.getMessage()));
-        }
+
+        startupAutoSaveToFile();
 
     }
 
@@ -60,13 +56,17 @@ public class UserWallet {
         walletFile = new File(walletFileName);
         wallet = Wallet.loadFromFile(walletFile);
 
+        startupAutoSaveToFile();
+
+    }
+
+    private void startupAutoSaveToFile() throws IOException {
         try {
             wallet.autosaveToFile(walletFile, 5, TimeUnit.SECONDS, null).saveNow();
         } catch (IOException e) {
-            logger.error(String.format("creating wallet file failed: %s", e.getMessage()));
-            throw new IOException(String.format("creating wallet file failed: %s", e.getMessage()));
+            logger.error(String.format("saving wallet file failed: %s", e.getMessage()));
+            throw new IOException(String.format("saving wallet file failed: %s", e.getMessage()));
         }
-
     }
 
     public void shutdownAutosaveAndSave() {
