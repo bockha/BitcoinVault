@@ -21,7 +21,7 @@ import java.util.concurrent.TimeUnit;
  */
 public class UserWallet {
 
-    private UUID id;
+    private UUID walletId;
     private String userId;
     private Wallet wallet;
     private Context context;
@@ -39,11 +39,11 @@ public class UserWallet {
         this.userId = userId;
         this.context = context;
 
-        id = UUID.randomUUID();
+        walletId = UUID.randomUUID();
 
         String workDir = System.getProperty("user.home") + "/." + PREFIX;
         new File(workDir).mkdirs();
-        walletFile = new File(workDir, PREFIX + id + ".wallet");
+        walletFile = new File(workDir, PREFIX + walletId + ".wallet");
 
         wallet = new Wallet(context);
 
@@ -56,7 +56,7 @@ public class UserWallet {
         this.userId = userId;
         this.context = context;
 
-        id = UUID.fromString(walletId);
+        this.walletId = UUID.fromString(walletId);
 
         walletFile = new File(walletFileName);
 
@@ -91,8 +91,8 @@ public class UserWallet {
         }
     }
 
-    public UUID getId() {
-        return id;
+    public UUID getWalletId() {
+        return walletId;
     }
 
     public String getUserId() {
@@ -176,7 +176,7 @@ public class UserWallet {
 
     public Payout getPayout(UUID payoutId) {
         if (!payouts.containsKey(payoutId)) {
-            throw new NullPointerException("There is no payout with the id " + payoutId);
+            throw new NullPointerException("There is no payout with the payout ID " + payoutId);
         }
 
         return payouts.get(payoutId);

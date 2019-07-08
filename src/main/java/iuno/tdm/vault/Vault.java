@@ -13,7 +13,6 @@ import org.bitcoinj.params.TestNet3Params;
 import org.bitcoinj.store.BlockStoreException;
 import org.bitcoinj.store.SPVBlockStore;
 import org.bitcoinj.utils.BriefLogFormatter;
-import org.bitcoinj.wallet.Wallet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -70,9 +69,9 @@ public class Vault {
         UserWallet wallet = new UserWallet(userId, context, peerGroup);
         blockChain.addWallet(wallet.getWallet());
         peerGroup.addWallet(wallet.getWallet());
-        userWallets.put(wallet.getId(),wallet);
+        userWallets.put(wallet.getWalletId(),wallet);
         vaultPersistence.addWallet(wallet);
-        return wallet.getId();
+        return wallet.getWalletId();
     }
 
     public void deleteWallet(UUID walletId) throws NullPointerException{
@@ -105,7 +104,7 @@ public class Vault {
         ArrayList<UUID> ids = new ArrayList<>();
         for (UserWallet wallet:userWallets.values()) {
             if (wallet.getUserId().equals(userId)){
-                ids.add(wallet.getId());
+                ids.add(wallet.getWalletId());
             }
         }
 
@@ -199,7 +198,7 @@ public class Vault {
         UserWallet[] uws = vaultPersistence.recoverWallets(context, peerGroup);
         for (UserWallet userWallet:uws) {
             if (resetWallets) userWallet.getWallet().reset();
-            userWallets.put(userWallet.getId(), userWallet);
+            userWallets.put(userWallet.getWalletId(), userWallet);
             blockChain.addWallet(userWallet.getWallet());
             peerGroup.addWallet(userWallet.getWallet());
         }

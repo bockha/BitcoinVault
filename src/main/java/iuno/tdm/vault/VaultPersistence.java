@@ -52,7 +52,7 @@ public class VaultPersistence {
     }
 
     public void addWallet(UserWallet userWallet) {
-        String walletId = userWallet.getId().toString();
+        String walletId = userWallet.getWalletId().toString();
         String userId = userWallet.getUserId();
         String walletFileName = userWallet.getWalletFile().toString();
 
@@ -70,7 +70,7 @@ public class VaultPersistence {
     }
 
     public void deleteWallet(UserWallet userWallet){
-        String walletId = userWallet.getId().toString();
+        String walletId = userWallet.getWalletId().toString();
         try{
             Statement statement = connection.createStatement();
             statement.setQueryTimeout(30);  // set timeout to 30 sec.
