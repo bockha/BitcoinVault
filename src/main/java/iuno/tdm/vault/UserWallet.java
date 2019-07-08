@@ -39,11 +39,13 @@ public class UserWallet {
         this.userId = userId;
         this.context = context;
 
-        walletId = UUID.randomUUID();
+        this.walletId = UUID.randomUUID();
 
         String workDir = System.getProperty("user.home") + "/." + PREFIX;
         new File(workDir).mkdirs();
-        walletFile = new File(workDir, PREFIX + walletId + ".wallet");
+        String walletFileName = workDir + "/" + PREFIX + walletId + ".wallet";
+
+        walletFile = new File(walletFileName);
 
         wallet = new Wallet(context);
 
@@ -60,7 +62,10 @@ public class UserWallet {
 
         walletFile = new File(walletFileName);
 
-        wallet = Wallet.loadFromFile(walletFile);
+        if (walletFile.exists())
+            wallet = Wallet.loadFromFile(walletFile);
+        else
+            wallet = new Wallet(context);
 
         startupAutoSaveToFile();
 
