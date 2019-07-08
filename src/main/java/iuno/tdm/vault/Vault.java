@@ -56,9 +56,6 @@ public class Vault {
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
-
-
-
     }
 
     public static Vault getInstance(){
@@ -208,6 +205,7 @@ public class Vault {
         }
 
         peerGroup.addPeerDiscovery(new DnsDiscovery(context.getParams()));
+        logger.info("trying to start peer group");
         Futures.addCallback(peerGroup.startAsync(), new FutureCallback() {
                     @Override
                     public void onSuccess(@Nullable Object o) {
@@ -262,6 +260,8 @@ public class Vault {
 
     public void stop(){
         peerGroup.stop();
+
+        for (UserWallet userWallet:userWallets.values()) userWallet.shutdownAutosaveAndSave();
     }
 
 }
